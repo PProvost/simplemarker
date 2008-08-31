@@ -4,10 +4,12 @@
 ## Author: Peter Provost (PProvost)
 ## Version: 1.0
 ## OptionalDeps: Ace3
+## SavedVariables: SimpleMarkerDB
 ## X-Category: Interface Enhancements
 ## X-License: Apache 2.0
 ## X-Embeds: Ace3
 
 Libs.xml
+Locales.lua
 SimpleMarker.lua
 

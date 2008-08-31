@@ -1,5 +1,5 @@
-<!--
-SimpleMarker/Libs.xml - Embedded libraries
+--[[
+SimpleMarker/Locales.lua
 
 Copyright 2008 Peter Provost
 
@@ -14,14 +14,19 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
--->
+]]
 
-<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="libs\LibStub\LibStub.lua"/>
-	<Include file="libs\AceAddon-3.0\AceAddon-3.0.xml"/>
-	<Include file="libs\AceConfig-3.0\AceConfig-3.0.xml"/>
-	<Include file="libs\AceConsole-3.0\AceConsole-3.0.xml"/>
-	<Include file="libs\AceDB-3.0\AceDB-3.0.xml"/>
-	<Include file="libs\AceEvent-3.0\AceEvent-3.0.xml"/>
-	<Include file="libs\AceLocale-3.0\AceLocale-3.0.xml" />
-</Ui>
+local AceLocale = LibStub("AceLocale-3.0")
+
+local L = AceLocale:NewLocale("SimpleMarker", "enUS", true)
+if L then
+	L["SYMBOL_NAME_BLANK"] = "Blank"
+	L["SYMBOL_NAME_STAR"] = "Star"
+	L["SYMBOL_NAME_CIRCLE"] = "Circle"
+	L["SYMBOL_NAME_DIAMOND"] = "Diamond"
+	L["SYMBOL_NAME_TRIANGLE"] = "Triangle"
+	L["SYMBOL_NAME_MOON"] = "Moon"
+	L["SYMBOL_NAME_SQUARE"] = "Square"
+	L["SYMBOL_NAME_CROSS"] = "Cross"
+	L["SYMBOL_NAME_SKULL"] = "Skull"
+end

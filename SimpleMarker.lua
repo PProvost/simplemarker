@@ -16,30 +16,72 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ]]
 
+--[[ Addon declaration ]]
 SimpleMarker = LibStub("AceAddon-3.0"):NewAddon("SimpleMarker", "AceConsole-3.0", "AceEvent-3.0")
 SimpleMarker.revision = tonumber(("$Revision: 25 $"):match("%d+"))
 SimpleMarker.date = ("$Date: 2008-08-22 18:50:01 -0600 (Fri, 22 Aug 2008) $"):match("%d%d%d%d%-%d%d%-%d%d")
 
--- TODO: Localize these
+--[[ Private locals ]]
+local db = nil
+local L = LibStub("AceLocale-3.0"):GetLocale("SimpleMarker")
 local iconNames = {
-	[0] = "Blank",
-	[1] = "Star",
-	[2] = "Circle",
-	[3] = "Diamond",
-	[4] = "Triangle",
-	[5] = "Moon",
-	[6] = "Square",
-	[7] = "Cross",
-	[8] = "Skull",
+	[0] = L["SYMBOL_NAME_BLANK"],
+	[1] = L["SYMBOL_NAME_STAR"],
+	[2] = L["SYMBOL_NAME_CIRCLE"],
+	[3] = L["SYMBOL_NAME_DIAMOND"],
+	[4] = L["SYMBOL_NAME_TRIANGLE"],
+	[5] = L["SYMBOL_NAME_MOON"],
+	[6] = L["SYMBOL_NAME_SQUARE"],
+	[7] = L["SYMBOL_NAME_CROSS"],
+	[8] = L["SYMBOL_NAME_SKULL"],
 }
 
+local options = {
+	type = "group",
+	handler = SimpleMarker,
+	args = {
+		lock = {
+			name = "Lock",
+			desc = "Lock/unlock the raid marks frame.",
+			type = "toggle",
+			get = function() return db.isLocked end,
+			set = function(val) 
+				db.isLocked = true
+				SimpleMarker:ToggleFrameLock() 
+			end,
+		},
+
+		config = {
+			name = "Config",
+			desc = "Opens the configuration dialog",
+			type = "execute",
+			func = function() LibStub("AceConfigDialog-3.0"):Open("SimpleMarker") end,
+			guiHidden = true,
+		}
+	}
+}
+
+local defaults = {
+	profile = {
+		isLocked = false,
+	}
+}
+
+--[[ Constructor ]]
 function SimpleMarker:OnInitialize()
+	self.db = LibStub("AceDB-3.0"):New("SimpleMarkerDB", defaults, "Default")
+	db = self.db.profile
+
+	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("SimpleMarker", options)
+	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("SimpleMarker", "SimpleMarker")
+	LibStub("AceConfigCmd-3.0"):CreateChatCommand("simplemarker", "SimpleMarker")
+
 	self:RegisterEvent("PARTY_MEMBERS_CHANGED", "CheckFrameVisibility")
 	self:RegisterEvent("RAID_ROSTER_UPDATE", "CheckFrameVisibility")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED", "CheckFrameVisibility")
 end
 
-local function CreateFrames()
+local function CreateSimpleMarkerFrame()
 	-- Parent anchor frame
 	local frame = CreateFrame("Frame", "SimpleMarker_Frame", UIParent)
 	frame:SetWidth(168)
@@ -95,7 +137,7 @@ local function CreateFrames()
 end
 
 function SimpleMarker:OnEnable()
-	self.frame = CreateFrames()
+	self.frame = CreateSimpleMarkerFrame()
 end
 
 local function CanSetRaidMarks()
@@ -111,3 +153,6 @@ function SimpleMarker:CheckFrameVisibility()
 	end
 end
 
+function SimpleMarker:ToggleFrameLock()
+	-- TODO
+end
