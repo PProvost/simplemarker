@@ -36,6 +36,21 @@ local iconNames = {
 	[8] = L["SYMBOL_NAME_SKULL"],
 }
 
+local defaults = {
+	profile = {
+		isLocked = false,
+		point = "CENTER",
+		relativePoint = "CENTER",
+		xOfs = 0,
+		yOfs = 0,
+		scale = 0.8,
+	}
+}
+
+local function SaveFrameLocation(frame)
+	db.point, _, db.relativePoint, db.xOfs, db.yOfs = frame:GetPoint()
+end
+
 local options = {
 	type = "group",
 	handler = SimpleMarker,
@@ -44,26 +59,39 @@ local options = {
 			name = "Lock",
 			desc = "Lock/unlock the raid marks frame.",
 			type = "toggle",
-			get = function() return db.isLocked end,
-			set = function(val) 
-				db.isLocked = true
-				SimpleMarker:ToggleFrameLock() 
-			end,
+			get = function(info) return db.isLocked end,
+			set = function(info, val) SimpleMarker:ToggleFrameLock() end,
+		},
+
+		scale = {
+			name = "Scale",
+			desc = "Sets the frame scale",
+			type = "range",
+			min = 0.25,
+			max = 2.0,
+			step = 0.05,
+			get  = function(info) return db.scale end,
+			set = function(info,val) SimpleMarker:SetFrameScale(val) end,
+		},
+
+		reset = {
+			name = "Reset",
+			desc = "Reset position to the center of the screen",
+			type = "execute",
+			func = function(info)
+				SimpleMarker:SetFrameScale(defaults.profile.scale)
+				SimpleMarker.frame:SetPoint(defaults.profile.point, UIParent, defaults.profile.relativePoint, defaults.profile.xOfs, defaults.profile.yOfs)
+				SaveFrameLocation(SimpleMarker.frame)
+			end
 		},
 
 		config = {
 			name = "Config",
 			desc = "Opens the configuration dialog",
 			type = "execute",
-			func = function() LibStub("AceConfigDialog-3.0"):Open("SimpleMarker") end,
+			func = function(info) LibStub("AceConfigDialog-3.0"):Open("SimpleMarker") end,
 			guiHidden = true,
-		}
-	}
-}
-
-local defaults = {
-	profile = {
-		isLocked = false,
+		},
 	}
 }
 
@@ -81,32 +109,26 @@ function SimpleMarker:OnInitialize()
 	self:RegisterEvent("PLAYER_TARGET_CHANGED", "CheckFrameVisibility")
 end
 
-local function CreateSimpleMarkerFrame()
+local function CreateAnchorFrame()
 	-- Parent anchor frame
 	local frame = CreateFrame("Frame", "SimpleMarker_Frame", UIParent)
-	frame:SetWidth(168)
-	frame:SetHeight(24)
-	frame:SetPoint("CENTER", UIParent, "CENTER", 0, -155)
-	frame:SetScale(0.8)
+	frame:SetWidth(176)
+	frame:SetHeight(32)
+	frame:SetPoint(db.point, UIParent, db.relativePoint, db.xOfs, db.yOfs)
+	frame:SetScale(db.scale)
 	frame:Hide()
 
-	-- TODO: Get rid of this once I know it is in the right place
-	--[[
-	frame:SetBackdrop({
-		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-		tile = true,
-		tileSize = 16,
-		edgeSize = 16,
-		insets = { left = 4, right = 4, top = 4, bottom = 4 }
-	})
-	frame:SetBackdropColor(0.25,0.25,0.25,1)
-	frame:SetBackdropBorderColor(0.75,0.75,0.75,1)
-	]]
+	frame:RegisterForDrag("LeftButton")
+	frame:SetScript("OnDragStart", function() this:StartMoving() end )
+	frame:SetScript("OnDragStop", function() 
+		this:StopMovingOrSizing() 
+		SaveFrameLocation(this)
+	end)
 
+	frame.buttons = {}
 	for i = 0,8 do
 		local button = CreateFrame("Button", nil, frame)
-		button:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -4+(-18*i), -4)
+		button:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -8+(-18*i), -8)
 		button:SetWidth(16)
 		button:SetHeight(16)
 		button:RegisterForClicks("AnyUp")
@@ -131,13 +153,17 @@ local function CreateSimpleMarkerFrame()
 			raidIcon:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcons")
 			SetRaidTargetIconTexture(raidIcon, i)
 		end
+
+		frame.buttons[i] = button
 	end
 
 	return frame
 end
 
 function SimpleMarker:OnEnable()
-	self.frame = CreateSimpleMarkerFrame()
+	self.frame = CreateAnchorFrame()
+	self:CheckFrameDraggable()
+	self:CheckFrameVisibility()
 end
 
 local function CanSetRaidMarks()
@@ -146,7 +172,7 @@ local function CanSetRaidMarks()
 end
 
 function SimpleMarker:CheckFrameVisibility()
-	if CanSetRaidMarks() and UnitExists("target") then
+	if (not db.isLocked) or (CanSetRaidMarks() and UnitExists("target")) then
 		self.frame:Show()
 	else
 		self.frame:Hide()
@@ -154,5 +180,38 @@ function SimpleMarker:CheckFrameVisibility()
 end
 
 function SimpleMarker:ToggleFrameLock()
-	-- TODO
+	db.isLocked = not db.isLocked
+	self:CheckFrameDraggable()
+	self:CheckFrameVisibility()
+end
+
+function SimpleMarker:CheckFrameDraggable()
+	local frame = self.frame
+	if not db.isLocked then
+		frame:SetBackdrop({
+			bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+			edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+			tile = true,
+			tileSize = 16,
+			edgeSize = 16,
+			insets = { left = 4, right = 4, top = 4, bottom = 4 }
+		})
+
+		frame:SetMovable(true)
+		frame:EnableMouse(true)
+		for i = 0,8 do frame.buttons[i]:Disable() end
+	else
+		frame:SetBackdrop(nil)
+		frame:SetMovable(false)
+		frame:EnableMouse(false)
+		for i = 0,8 do frame.buttons[i]:Disable() end
+	end
+end
+
+function SimpleMarker:SetFrameScale(val)
+	db.scale = val
+	local frame = self.frame
+	if frame then
+		frame:SetScale(val)
+	end
 end
