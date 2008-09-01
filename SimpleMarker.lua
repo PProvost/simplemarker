@@ -204,7 +204,7 @@ function SimpleMarker:CheckFrameDraggable()
 		frame:SetBackdrop(nil)
 		frame:SetMovable(false)
 		frame:EnableMouse(false)
-		for i = 0,8 do frame.buttons[i]:Disable() end
+		for i = 0,8 do frame.buttons[i]:Enable() end
 	end
 end
 
