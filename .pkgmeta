@@ -7,3 +7,4 @@ externals:
  libs/AceEvent-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceEvent-3.0
  libs/AceLocale-3.0: http://svn.wowace.com/wowace/trunk/Ace3/AceLocale-3.0
 
+package-as: SimpleMarker
