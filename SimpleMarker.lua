@@ -199,12 +199,18 @@ function SimpleMarker:CheckFrameDraggable()
 
 		frame:SetMovable(true)
 		frame:EnableMouse(true)
-		for i = 0,8 do frame.buttons[i]:Disable() end
+		for i = 0,8 do 
+			frame.buttons[i]:Disable() 
+			frame.buttons[i]:EnableMouse(false)
+		end
 	else
 		frame:SetBackdrop(nil)
 		frame:SetMovable(false)
 		frame:EnableMouse(false)
-		for i = 0,8 do frame.buttons[i]:Enable() end
+		for i = 0,8 do 
+			frame.buttons[i]:Enable() 
+			frame.buttons[i]:EnableMouse(true)
+		end
 	end
 end
 
@@ -215,3 +221,30 @@ function SimpleMarker:SetFrameScale(val)
 		frame:SetScale(val)
 	end
 end
+
+local function GetTipAnchor(frame)
+	local x,y = frame:GetCenter()
+	if not x or not y then return "TOPLEFT", "BOTTOMLEFT" end
+	local hhalf = (x > UIParent:GetWidth()*2/3) and "RIGHT" or (x < UIParent:GetWidth()/3) and "LEFT" or ""
+	local vhalf = (y > UIParent:GetHeight()/2) and "TOP" or "BOTTOM"
+	return vhalf..hhalf, frame, (vhalf == "TOP" and "BOTTOM" or "TOP")..hhalf
+end
+
+--[[ Setup the LDB launcher ]]
+LibStub:GetLibrary("LibDataBroker-1.1"):NewDataObject("SimpleMarker", {
+	icon = [[Interface\AddOns\SimpleMarker\Icon]],
+	text = "SimpleMarker",
+	OnClick = function(frame, button)
+		SimpleMarker:ToggleFrameLock() 
+	end,
+	OnEnter = function(frame)
+		GameTooltip:SetOwner(frame, "ANCHOR_NONE")
+		GameTooltip:SetPoint(GetTipAnchor(frame))
+		GameTooltip:ClearLines()
+
+		GameTooltip:AddLine("SimpleMarker")
+		GameTooltip:AddLine("")
+		GameTooltip:AddLine("Click to display the draggable anchor frame")
+	end
+})
+
