@@ -10,6 +10,9 @@
 ## X-Embeds: Ace3
 ## X-Credits: FamFam Silk for the LDB Launcher icon (http://www.famfamfam.com/lab/icons/silk/)
 
+## LoadManagers: AddonLoader
+## X-LoadOn-Group: true
+
 Libs.xml
 Locales.lua
 LibDataBroker-1.1.lua
