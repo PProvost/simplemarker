@@ -245,6 +245,11 @@ LibStub:GetLibrary("LibDataBroker-1.1"):NewDataObject("SimpleMarker", {
 		GameTooltip:AddLine("SimpleMarker")
 		GameTooltip:AddLine("")
 		GameTooltip:AddLine("Click to display the draggable anchor frame")
-	end
+
+		GameTooltip:Show()
+	end,
+	OnHide = function()
+		GameTooltip:Hide()
+	end,
 })
 
