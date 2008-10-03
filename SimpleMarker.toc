@@ -1,7 +1,7 @@
 ## Interface: 20400
 ## Title: Simple Marker
 ## Notes: A simple raid target marking frame. Put it wherever you want and click to assign marks.
-## Author: Peter Provost (PProvost)
+## Author: Quaiche
 ## Version: 1.0
 ## OptionalDeps: Ace3
 ## SavedVariables: SimpleMarkerDB
@@ -13,6 +13,7 @@
 ## LoadManagers: AddonLoader
 ## X-LoadOn-Group: true
 
+tekKonfigAboutPanel.lua
 Libs.xml
 Locales.lua
 LibDataBroker-1.1.lua

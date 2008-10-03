@@ -107,6 +107,8 @@ function SimpleMarker:OnInitialize()
 	self:RegisterEvent("PARTY_MEMBERS_CHANGED", "CheckFrameVisibility")
 	self:RegisterEvent("RAID_ROSTER_UPDATE", "CheckFrameVisibility")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED", "CheckFrameVisibility")
+
+	LibStub("tekKonfig-AboutPanel").new(nil, "SimpleMarker")
 end
 
 local function CreateAnchorFrame()
