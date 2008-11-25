@@ -2,13 +2,17 @@
 ## Title: Simple Marker
 ## Notes: A simple raid target marking frame. Put it wherever you want and click to assign marks.
 ## Author: Quaiche
-## Version: 1.2
+## Version: 1.3
 ## OptionalDeps: Ace3
 ## SavedVariables: SimpleMarkerDB
 ## X-Category: Interface Enhancements
 ## X-License: Apache 2.0
 ## X-Embeds: Ace3
 ## X-Credits: FamFam Silk for the LDB Launcher icon (http://www.famfamfam.com/lab/icons/silk/)
+
+## LoadManagers: AddonLoader
+## X-LoadOn-Group: true
+## X-LoadOn-Slash: /simplemarker
 
 libs\LibStub\LibStub.lua
 libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
