@@ -100,15 +100,14 @@ function SimpleMarker:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("SimpleMarkerDB", defaults, "Default")
 	db = self.db.profile
 
-	LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("SimpleMarker", options)
-	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("SimpleMarker", "SimpleMarker")
-	LibStub("AceConfigCmd-3.0"):CreateChatCommand("simplemarker", "SimpleMarker")
-
 	self:RegisterEvent("PARTY_MEMBERS_CHANGED", "CheckFrameVisibility")
 	self:RegisterEvent("RAID_ROSTER_UPDATE", "CheckFrameVisibility")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED", "CheckFrameVisibility")
 
-	LibStub("tekKonfig-AboutPanel").new(nil, "SimpleMarker")
+	LibStub("AceConfig-3.0"):RegisterOptionsTable("SimpleMarker", options, {"simplemarker"} )
+
+	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("SimpleMarker", "SimpleMarker")
+	LibStub("tekKonfig-AboutPanel").new("SimpleMarker", "SimpleMarker")
 end
 
 local function CreateAnchorFrame()
@@ -233,25 +232,27 @@ local function GetTipAnchor(frame)
 end
 
 --[[ Setup the LDB launcher ]]
-LibStub:GetLibrary("LibDataBroker-1.1"):NewDataObject("SimpleMarker", {
-	icon = [[Interface\AddOns\SimpleMarker\Icon]],
-	text = "SimpleMarker",
-	OnClick = function(frame, button)
-		SimpleMarker:ToggleFrameLock() 
-	end,
-	OnEnter = function(frame)
-		GameTooltip:SetOwner(frame, "ANCHOR_NONE")
-		GameTooltip:SetPoint(GetTipAnchor(frame))
-		GameTooltip:ClearLines()
+local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
+if LDB then 
+	LDB:NewDataObject("SimpleMarker", {
+		icon = "Interface\\AddOns\\SimpleMarker\\Icon",
+		text = "SimpleMarker",
+		OnClick = function(frame, button)
+			SimpleMarker:ToggleFrameLock() 
+		end,
+		OnEnter = function(frame)
+			GameTooltip:SetOwner(frame, "ANCHOR_NONE")
+			GameTooltip:SetPoint(GetTipAnchor(frame))
+			GameTooltip:ClearLines()
 
-		GameTooltip:AddLine("SimpleMarker")
-		GameTooltip:AddLine("")
-		GameTooltip:AddLine("Click to display the draggable anchor frame")
+			GameTooltip:AddLine("SimpleMarker")
+			GameTooltip:AddLine("")
+			GameTooltip:AddLine("Click to display the draggable anchor frame")
 
-		GameTooltip:Show()
-	end,
-	OnHide = function()
-		GameTooltip:Hide()
-	end,
-})
-
+			GameTooltip:Show()
+		end,
+		OnHide = function()
+			GameTooltip:Hide()
+		end,
+	})
+end

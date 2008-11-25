@@ -10,12 +10,20 @@
 ## X-Embeds: Ace3
 ## X-Credits: FamFam Silk for the LDB Launcher icon (http://www.famfamfam.com/lab/icons/silk/)
 
-## LoadManagers: AddonLoader
-## X-LoadOn-Group: true
+libs\LibStub\LibStub.lua
+libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
 
-tekKonfigAboutPanel.lua
-Libs.xml
-Locales.lua
+libs\AceAddon-3.0\AceAddon-3.0.lua
+libs\AceGUI-3.0\AceGUI-3.0.xml
+libs\AceConfig-3.0\AceConfig-3.0.xml
+libs\AceConsole-3.0\AceConsole-3.0.xml
+libs\AceDB-3.0\AceDB-3.0.xml
+libs\AceEvent-3.0\AceEvent-3.0.xml
+libs\AceLocale-3.0\AceLocale-3.0.xml
+
 LibDataBroker-1.1.lua
+tekKonfigAboutPanel.lua
+
+Locales.lua
 SimpleMarker.lua
 
