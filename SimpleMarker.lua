@@ -235,6 +235,7 @@ end
 local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
 if LDB then 
 	LDB:NewDataObject("SimpleMarker", {
+		type = "launcher",
 		icon = "Interface\\AddOns\\SimpleMarker\\Icon",
 		text = "SimpleMarker",
 		OnClick = function(frame, button)
