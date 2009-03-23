@@ -16,14 +16,38 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ]]
 
---[[ Addon declaration ]]
-SimpleMarker = LibStub("AceAddon-3.0"):NewAddon("SimpleMarker", "AceConsole-3.0", "AceEvent-3.0")
-SimpleMarker.revision = tonumber(("$Revision: 25 $"):match("%d+"))
-SimpleMarker.date = ("$Date: 2008-08-22 18:50:01 -0600 (Fri, 22 Aug 2008) $"):match("%d%d%d%d%-%d%d%-%d%d")
+local addonName = "SimpleMarker"
+
+--[[ Helper functions ]]
+local function Print(...) print("|cFF33FF99"..addonName.."|r:", ...) end
+local function Debug(...) local debugf = tekDebug and tekDebug:GetFrame(addonName); if debugf then debugf:AddMessage(string.join(", ", tostringall(...))) end end
+local function CanSetRaidMarks() return (GetNumPartyMembers() > 0 and IsPartyLeader()) or (GetNumRaidMembers() > 0 and (IsRaidLeader() or IsRaidOfficer())) end
+local function GetTipAnchor(frame)
+	local x,y = frame:GetCenter(); if not x or not y then return "TOPLEFT", "BOTTOMLEFT" end
+	local hhalf = (x > UIParent:GetWidth()*2/3) and "RIGHT" or (x < UIParent:GetWidth()/3) and "LEFT" or ""
+	local vhalf = (y > UIParent:GetHeight()/2) and "TOP" or "BOTTOM"
+	return vhalf..hhalf, frame, (vhalf == "TOP" and "BOTTOM" or "TOP")..hhalf
+end
+local function GetSlashCommand(msg) -- returns: command, args
+	if msg then
+		local a,b,c = string.find(msg, "(%S+)");
+		if a then return c, string.sub(msg, b+2); else	return ""; end
+	end
+end
+
+--[[ Localization ]]
+L = setmetatable( {}, {__index = function(self, key) rawset(self, key, key) return key end })
+L["SYMBOL_NAME_BLANK"] = "Blank"
+L["SYMBOL_NAME_STAR"] = "Star"
+L["SYMBOL_NAME_CIRCLE"] = "Circle"
+L["SYMBOL_NAME_DIAMOND"] = "Diamond"
+L["SYMBOL_NAME_TRIANGLE"] = "Triangle"
+L["SYMBOL_NAME_MOON"] = "Moon"
+L["SYMBOL_NAME_SQUARE"] = "Square"
+L["SYMBOL_NAME_CROSS"] = "Cross"
+L["SYMBOL_NAME_SKULL"] = "Skull"
 
 --[[ Private locals ]]
-local db = nil
-local L = LibStub("AceLocale-3.0"):GetLocale("SimpleMarker")
 local iconNames = {
 	[0] = L["SYMBOL_NAME_BLANK"],
 	[1] = L["SYMBOL_NAME_STAR"],
@@ -36,81 +60,61 @@ local iconNames = {
 	[8] = L["SYMBOL_NAME_SKULL"],
 }
 
+--[[ Saved var local and defaults ]]
+local db
 local defaults = {
-	profile = {
-		isLocked = true,
-		point = "CENTER",
-		relativePoint = "CENTER",
-		xOfs = 0,
-		yOfs = 0,
-		scale = 0.8,
-	}
+	isLocked = true,
+	point = "CENTER",
+	relativePoint = "CENTER",
+	xOfs = 0,
+	yOfs = 0,
+	scale = 0.8,
 }
 
-local function SaveFrameLocation(frame)
-	db.point, _, db.relativePoint, db.xOfs, db.yOfs = frame:GetPoint()
+--[[ Addon frame ]]
+SimpleMarker = CreateFrame("Frame")
+SimpleMarker:SetScript("OnEvent", function(self, event, ...) if self[event] then return self[event](self, event, ...) end end )
+SimpleMarker:RegisterEvent("ADDON_LOADED")
+
+function SimpleMarker:ADDON_LOADED(event, addon)
+  if addon:lower() ~= "simplemarker" then return end
+ 
+  SimpleMarkerDB = setmetatable(SimpleMarkerDB or {}, {__index = defaults})
+  db = SimpleMarkerDB
+ 
+	self:RegisterEvent("PARTY_MEMBERS_CHANGED"); self.PARTY_MEMBERS_CHANGED = self.CheckFrameVisibility
+	self:RegisterEvent("RAID_ROSTER_UPDATE"); self.RAID_ROSTER_UPDATE = self.CheckFrameVisibility
+	self:RegisterEvent("PLAYER_TARGET_CHANGED"); self.PLAYER_TARGET_CHANGED = self.CheckFrameVisibility
+
+	self:SetupLDBLauncher()
+	self:SetupSlashCommands()
+ 
+  LibStub("tekKonfig-AboutPanel").new(nil, addonName) -- Make first arg nil if no parent config panel
+ 
+  self:UnregisterEvent("ADDON_LOADED")
+  self.ADDON_LOADED = nil
+ 
+  if IsLoggedIn() then self:PLAYER_LOGIN() else self:RegisterEvent("PLAYER_LOGIN") end
+end
+ 
+function SimpleMarker:PLAYER_LOGIN()
+  self:RegisterEvent("PLAYER_LOGOUT")
+ 
+  -- Do anything you need to do after the player has entered the world
+	self:CreateAnchorFrame()
+	self:CheckFrameDraggable()
+	self:CheckFrameVisibility()
+ 
+  self:UnregisterEvent("PLAYER_LOGIN")
+  self.PLAYER_LOGIN = nil
+end
+ 
+function SimpleMarker:PLAYER_LOGOUT()
+  for i,v in pairs(defaults) do if db[i] == v then db[i] = nil end end
+  -- Do anything you need to do as the player logs out
 end
 
-local options = {
-	type = "group",
-	handler = SimpleMarker,
-	args = {
-		lock = {
-			name = "Lock",
-			desc = "Lock/unlock the raid marks frame.",
-			type = "toggle",
-			get = function(info) return db.isLocked end,
-			set = function(info, val) SimpleMarker:ToggleFrameLock() end,
-		},
-
-		scale = {
-			name = "Scale",
-			desc = "Sets the frame scale",
-			type = "range",
-			min = 0.25,
-			max = 2.0,
-			step = 0.05,
-			get  = function(info) return db.scale end,
-			set = function(info,val) SimpleMarker:SetFrameScale(val) end,
-		},
-
-		reset = {
-			name = "Reset",
-			desc = "Reset position to the center of the screen",
-			type = "execute",
-			func = function(info)
-				SimpleMarker:SetFrameScale(defaults.profile.scale)
-				SimpleMarker.frame:SetPoint(defaults.profile.point, UIParent, defaults.profile.relativePoint, defaults.profile.xOfs, defaults.profile.yOfs)
-				SaveFrameLocation(SimpleMarker.frame)
-			end
-		},
-
-		config = {
-			name = "Config",
-			desc = "Opens the configuration dialog",
-			type = "execute",
-			func = function(info) LibStub("AceConfigDialog-3.0"):Open("SimpleMarker") end,
-			guiHidden = true,
-		},
-	}
-}
-
---[[ Constructor ]]
-function SimpleMarker:OnInitialize()
-	self.db = LibStub("AceDB-3.0"):New("SimpleMarkerDB", defaults, "Default")
-	db = self.db.profile
-
-	self:RegisterEvent("PARTY_MEMBERS_CHANGED", "CheckFrameVisibility")
-	self:RegisterEvent("RAID_ROSTER_UPDATE", "CheckFrameVisibility")
-	self:RegisterEvent("PLAYER_TARGET_CHANGED", "CheckFrameVisibility")
-
-	LibStub("AceConfig-3.0"):RegisterOptionsTable("SimpleMarker", options, {"simplemarker"} )
-
-	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("SimpleMarker", "SimpleMarker")
-	LibStub("tekKonfig-AboutPanel").new("SimpleMarker", "SimpleMarker")
-end
-
-local function CreateAnchorFrame()
+function SimpleMarker:CreateAnchorFrame()
 	-- Parent anchor frame
 	local frame = CreateFrame("Frame", "SimpleMarker_Frame", UIParent)
 	frame:SetWidth(176)
@@ -123,7 +127,7 @@ local function CreateAnchorFrame()
 	frame:SetScript("OnDragStart", function() this:StartMoving() end )
 	frame:SetScript("OnDragStop", function() 
 		this:StopMovingOrSizing() 
-		SaveFrameLocation(this)
+		self:SaveFrameLocation(this)
 	end)
 
 	frame.buttons = {}
@@ -133,16 +137,12 @@ local function CreateAnchorFrame()
 		button:SetWidth(16)
 		button:SetHeight(16)
 		button:RegisterForClicks("AnyUp")
-		button:SetScript("OnClick", function(self)
-			SetRaidTarget("target", i)
-		end)
+		button:SetScript("OnClick", function(self) SetRaidTarget("target", i) end)
+		button:SetScript("OnLeave", function(self) GameTooltip:Hide() end)
 		button:SetScript("OnEnter", function(self)
 			GameTooltip_SetDefaultAnchor( GameTooltip, UIParent )
 			GameTooltip:SetText(iconNames[i])
 			GameTooltip:Show()
-		end)
-		button:SetScript("OnLeave", function(self)
-			GameTooltip:Hide()
 		end)
 
 		local raidIcon = button:CreateTexture(nil, "ARTWORK")
@@ -158,18 +158,7 @@ local function CreateAnchorFrame()
 		frame.buttons[i] = button
 	end
 
-	return frame
-end
-
-function SimpleMarker:OnEnable()
-	self.frame = CreateAnchorFrame()
-	self:CheckFrameDraggable()
-	self:CheckFrameVisibility()
-end
-
-local function CanSetRaidMarks()
-	return (GetNumPartyMembers() > 0 and IsPartyLeader()) or
-				 (GetNumRaidMembers() > 0 and (IsRaidLeader() or IsRaidOfficer()))
+	self.frame = frame
 end
 
 function SimpleMarker:CheckFrameVisibility()
@@ -184,6 +173,7 @@ function SimpleMarker:ToggleFrameLock()
 	db.isLocked = not db.isLocked
 	self:CheckFrameDraggable()
 	self:CheckFrameVisibility()
+	Print("Frame " .. (db.isLocked and "locked" or "unlocked"))
 end
 
 function SimpleMarker:CheckFrameDraggable()
@@ -218,42 +208,70 @@ end
 function SimpleMarker:SetFrameScale(val)
 	db.scale = val
 	local frame = self.frame
-	if frame then
-		frame:SetScale(val)
+	if frame then frame:SetScale(val) end
+end
+
+function SimpleMarker:SetupLDBLauncher()
+	local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
+	if LDB then 
+		LDB:NewDataObject(addonName, {
+			type = "launcher",
+			icon = "Interface\\AddOns\\" .. addonName .. "\\Icon",
+			text = addonName,
+
+			OnClick = function(frame, button)
+				self:ToggleFrameLock() 
+			end,
+
+			OnEnter = function(frame)
+				GameTooltip:SetOwner(frame, "ANCHOR_NONE")
+				GameTooltip:SetPoint(GetTipAnchor(frame))
+				GameTooltip:ClearLines()
+
+				GameTooltip:AddLine(addonName)
+				GameTooltip:AddLine("")
+				GameTooltip:AddLine("Click to display the draggable anchor frame")
+
+				GameTooltip:Show()
+			end,
+
+			OnHide = function()
+				GameTooltip:Hide()
+			end,
+		})
 	end
 end
 
-local function GetTipAnchor(frame)
-	local x,y = frame:GetCenter()
-	if not x or not y then return "TOPLEFT", "BOTTOMLEFT" end
-	local hhalf = (x > UIParent:GetWidth()*2/3) and "RIGHT" or (x < UIParent:GetWidth()/3) and "LEFT" or ""
-	local vhalf = (y > UIParent:GetHeight()/2) and "TOP" or "BOTTOM"
-	return vhalf..hhalf, frame, (vhalf == "TOP" and "BOTTOM" or "TOP")..hhalf
+function SimpleMarker:SaveFrameLocation(frame)
+	db.point, _, db.relativePoint, db.xOfs, db.yOfs = frame:GetPoint()
 end
 
---[[ Setup the LDB launcher ]]
-local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
-if LDB then 
-	LDB:NewDataObject("SimpleMarker", {
-		type = "launcher",
-		icon = "Interface\\AddOns\\SimpleMarker\\Icon",
-		text = "SimpleMarker",
-		OnClick = function(frame, button)
-			SimpleMarker:ToggleFrameLock() 
-		end,
-		OnEnter = function(frame)
-			GameTooltip:SetOwner(frame, "ANCHOR_NONE")
-			GameTooltip:SetPoint(GetTipAnchor(frame))
-			GameTooltip:ClearLines()
+function SimpleMarker:ResetOptions()
+	SimpleMarker:SetFrameScale(defaults.scale)
+	SimpleMarker.frame:SetPoint(defaults.point, UIParent, defaults.relativePoint, defaults.xOfs, defaults.yOfs)
+	self:SaveFrameLocation(SimpleMarker.frame)
+end
 
-			GameTooltip:AddLine("SimpleMarker")
-			GameTooltip:AddLine("")
-			GameTooltip:AddLine("Click to display the draggable anchor frame")
+function SimpleMarker:SetupSlashCommands()
+	SLASH_SIMPLEMARKER1 = "/simplemarker"
+	SlashCmdList.SIMPLEMARKER = function(msg)
+		local command, args = GetSlashCommand(msg)
+		if command == "lock" then
+			self:ToggleFrameLock()
+		elseif command == "scale" then
+			local n = tonumber(args)
+			if n then self:SetFrameScale(n) else PrintUsage() end
+		elseif command == "reset" then
+			self:ResetOptions()
+		else
+			self:PrintUsage()
+		end
+	end
+end
 
-			GameTooltip:Show()
-		end,
-		OnHide = function()
-			GameTooltip:Hide()
-		end,
-	})
+function SimpleMarker:PrintUsage()
+	Print("Usage:")
+	Print(" /simplemarker lock - locks and unlocks the marking frame")
+	Print(" /simplemarker scale N - sets the frame scale to N")
+	Print(" /simplemarker reset - resets position and scale to defaults")
 end

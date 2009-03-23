@@ -1,31 +1,5 @@
 package-as: SimpleMarker
 
-externals:
- libs/LibStub:
-  url: svn://svn.wowace.com/wow/ace3/mainline/trunk/LibStub
-	tag: latest
- libs/AceAddon-3.0:
-  url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceAddon-3.0
-	tag: latest
- libs/AceConfig-3.0:
-  url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceConfig-3.0
-	tag: latest
- libs/AceConsole-3.0:
-  url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceConsole-3.0
-  tag: latest
- libs/AceDB-3.0:
-  url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceDB-3.0
-	tag: latest
- libs/AceEvent-3.0:
-  url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceEvent-3.0
-	tag: latest
- libs/AceLocale-3.0:
-  url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceLocale-3.0
-	tag: latest
- libs/AceGUI-3.0:
-  url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceGUI-3.0
-	tag: latest
-
 ignore:
  - Other # ignore the Other folder
 
