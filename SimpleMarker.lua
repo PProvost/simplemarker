@@ -69,6 +69,7 @@ local defaults = {
 	xOfs = 0,
 	yOfs = 0,
 	scale = 0.8,
+	alpha = 1.0,
 }
 
 --[[ Addon frame ]]
@@ -121,6 +122,7 @@ function SimpleMarker:CreateAnchorFrame()
 	frame:SetHeight(32)
 	frame:SetPoint(db.point, UIParent, db.relativePoint, db.xOfs, db.yOfs)
 	frame:SetScale(db.scale)
+	frame:SetAlpha(db.alpha)
 	frame:Hide()
 
 	frame:RegisterForDrag("LeftButton")
@@ -211,6 +213,13 @@ function SimpleMarker:SetFrameScale(val)
 	if frame then frame:SetScale(val) end
 end
 
+function SimpleMarker:SetFrameAlpha(val)
+	db.alpha = val
+	local frame = self.frame
+	if frame then frame:SetAlpha(val) end
+end
+
+
 function SimpleMarker:SetupLDBLauncher()
 	local LDB = LibStub:GetLibrary("LibDataBroker-1.1")
 	if LDB then 
@@ -248,6 +257,7 @@ end
 
 function SimpleMarker:ResetOptions()
 	SimpleMarker:SetFrameScale(defaults.scale)
+	SimpleMarker:SetFrameAlpha(defaults.alpha)
 	SimpleMarker.frame:SetPoint(defaults.point, UIParent, defaults.relativePoint, defaults.xOfs, defaults.yOfs)
 	self:SaveFrameLocation(SimpleMarker.frame)
 end
@@ -263,6 +273,9 @@ function SimpleMarker:SetupSlashCommands()
 			if n then self:SetFrameScale(n) else PrintUsage() end
 		elseif command == "reset" then
 			self:ResetOptions()
+		elseif command == "alpha" then
+			local n = tonumber(args)
+			if n then	self:SetFrameAlpha(n) else PrintUsage() end
 		else
 			self:PrintUsage()
 		end
