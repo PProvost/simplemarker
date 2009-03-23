@@ -38,7 +38,7 @@ local iconNames = {
 
 local defaults = {
 	profile = {
-		isLocked = false,
+		isLocked = true,
 		point = "CENTER",
 		relativePoint = "CENTER",
 		xOfs = 0,
