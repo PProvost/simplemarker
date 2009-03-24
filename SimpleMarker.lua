@@ -284,7 +284,8 @@ end
 
 function SimpleMarker:PrintUsage()
 	Print("Usage:")
-	Print(" /simplemarker lock - locks and unlocks the marking frame")
-	Print(" /simplemarker scale N - sets the frame scale to N")
-	Print(" /simplemarker reset - resets position and scale to defaults")
+	print("/simplemarker lock - locks and unlocks the marking frame")
+	print("/simplemarker scale N - sets the frame scale to N")
+	print("/simplemarker reset - resets position and scale to defaults")
+	print("/simplemarker alpha N - sets the frame alpha to N")
 end

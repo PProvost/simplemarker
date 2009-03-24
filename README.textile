@@ -14,7 +14,8 @@ The following slash commands are available:
 |/simplemarker|Displays slash command help message|
 |/simplemarker config|Pops up the configuration UI|
 |/simplemarker lock|Locks or unlocks the marking frame|
-|/simplemarker scale N|Sets the frame size. Must be between 0.25 and 2.0|
+|/simplemarker scale N|Sets the frame size.|
+|/simplemarker alpha N|Sets the frame alpha.|
 
 h2. Bugs, Suggestions or Comments
 
