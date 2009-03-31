@@ -270,12 +270,12 @@ function SimpleMarker:SetupSlashCommands()
 			self:ToggleFrameLock()
 		elseif command == "scale" then
 			local n = tonumber(args)
-			if n then self:SetFrameScale(n) else PrintUsage() end
+			if n then self:SetFrameScale(n) else self:PrintUsage() end
 		elseif command == "reset" then
 			self:ResetOptions()
 		elseif command == "alpha" then
 			local n = tonumber(args)
-			if n then	self:SetFrameAlpha(n) else PrintUsage() end
+			if n then	self:SetFrameAlpha(n) else self:PrintUsage() end
 		else
 			self:PrintUsage()
 		end
