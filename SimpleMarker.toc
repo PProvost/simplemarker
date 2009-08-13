@@ -1,8 +1,8 @@
-## Interface: 30100
+## Interface: 30200
 ## Title: Simple Marker
 ## Notes: A simple raid target marking frame. Put it wherever you want and click to assign marks.
 ## Author: Quaiche
-## Version: 2.0
+## Version: @project-version@
 ## SavedVariables: SimpleMarkerDB
 ## X-Category: Interface Enhancements
 ## X-License: Apache 2.0
