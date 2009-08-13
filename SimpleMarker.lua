@@ -18,7 +18,8 @@ limitations under the License.
 
 local addonName = "SimpleMarker"
 
---[[ Helper functions ]]
+local L = setmetatable({}, {__index=function(t,i) return i end})
+
 local function Print(...) print("|cFF33FF99"..addonName.."|r:", ...) end
 local function Debug(...) local debugf = tekDebug and tekDebug:GetFrame(addonName); if debugf then debugf:AddMessage(string.join(", ", tostringall(...))) end end
 local function CanSetRaidMarks() return (GetNumPartyMembers() > 0 and IsPartyLeader()) or (GetNumRaidMembers() > 0 and (IsRaidLeader() or IsRaidOfficer())) end
@@ -35,32 +36,18 @@ local function GetSlashCommand(msg) -- returns: command, args
 	end
 end
 
---[[ Localization ]]
-L = setmetatable( {}, {__index = function(self, key) rawset(self, key, key) return key end })
-L["SYMBOL_NAME_BLANK"] = "Blank"
-L["SYMBOL_NAME_STAR"] = "Star"
-L["SYMBOL_NAME_CIRCLE"] = "Circle"
-L["SYMBOL_NAME_DIAMOND"] = "Diamond"
-L["SYMBOL_NAME_TRIANGLE"] = "Triangle"
-L["SYMBOL_NAME_MOON"] = "Moon"
-L["SYMBOL_NAME_SQUARE"] = "Square"
-L["SYMBOL_NAME_CROSS"] = "Cross"
-L["SYMBOL_NAME_SKULL"] = "Skull"
-
---[[ Private locals ]]
 local iconNames = {
-	[0] = L["SYMBOL_NAME_BLANK"],
-	[1] = L["SYMBOL_NAME_STAR"],
-	[2] = L["SYMBOL_NAME_CIRCLE"],
-	[3] = L["SYMBOL_NAME_DIAMOND"],
-	[4] = L["SYMBOL_NAME_TRIANGLE"],
-	[5] = L["SYMBOL_NAME_MOON"],
-	[6] = L["SYMBOL_NAME_SQUARE"],
-	[7] = L["SYMBOL_NAME_CROSS"],
-	[8] = L["SYMBOL_NAME_SKULL"],
+	[0] = L["Blank"],
+	[1] = L["Star"],
+	[2] = L["Circle"],
+	[3] = L["Diamond"],
+	[4] = L["Triangle"],
+	[5] = L["Moon"],
+	[6] = L["Square"],
+	[7] = L["Cross"],
+	[8] = L["Skull"],
 }
 
---[[ Saved var local and defaults ]]
 local db
 local defaults = {
 	isLocked = true,
@@ -101,7 +88,6 @@ end
 function SimpleMarker:PLAYER_LOGIN()
   self:RegisterEvent("PLAYER_LOGOUT")
  
-  -- Do anything you need to do after the player has entered the world
 	self:CreateAnchorFrame()
 	self:CheckFrameDraggable()
 	self:CheckFrameVisibility()
@@ -116,7 +102,6 @@ function SimpleMarker:PLAYER_LOGOUT()
 end
 
 function SimpleMarker:CreateAnchorFrame()
-	-- Parent anchor frame
 	local frame = CreateFrame("Frame", "SimpleMarker_Frame", UIParent)
 	frame:SetWidth(176)
 	frame:SetHeight(32)
@@ -239,7 +224,7 @@ function SimpleMarker:SetupLDBLauncher()
 
 				GameTooltip:AddLine(addonName)
 				GameTooltip:AddLine("")
-				GameTooltip:AddLine("Click to display the draggable anchor frame")
+				GameTooltip:AddLine(L["Click to display the draggable anchor frame"])
 
 				GameTooltip:Show()
 			end,
@@ -263,7 +248,7 @@ function SimpleMarker:ResetOptions()
 end
 
 function SimpleMarker:SetupSlashCommands()
-	SLASH_SIMPLEMARKER1 = "/simplemarker"
+	SLASH_SIMPLEMARKER1 = L["/simplemarker"]
 	SlashCmdList.SIMPLEMARKER = function(msg)
 		local command, args = GetSlashCommand(msg)
 		if command == "lock" then
@@ -283,9 +268,9 @@ function SimpleMarker:SetupSlashCommands()
 end
 
 function SimpleMarker:PrintUsage()
-	Print("Usage:")
-	print("/simplemarker lock - locks and unlocks the marking frame")
-	print("/simplemarker scale N - sets the frame scale to N")
-	print("/simplemarker reset - resets position and scale to defaults")
-	print("/simplemarker alpha N - sets the frame alpha to N")
+	Print(L["Usage:"])
+	print(L["/simplemarker lock - locks and unlocks the marking frame"])
+	print(L["/simplemarker scale N - sets the frame scale to N"])
+	print(L["/simplemarker reset - resets position and scale to defaults"])
+	print(L["/simplemarker alpha N - sets the frame alpha to N"])
 end

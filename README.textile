@@ -2,8 +2,6 @@ h2. About SimpleMarker
 
 A simple on-screen set of raid target buttons that only appear when you are allowed to mark (raid/group leader or assitant) and have a target. Easily positioned by dragging where you want it to be.
 
-To help conserve resources, SimpleMarker supports AddonLoader for Load-on-Demand loading. When AddonLoader is also installed, SimpleMarker will not load unless you join a group or issue the /simplemarker command.
-
 When first installed, the frame will be positioned in the center of the screen. To unlock it and move it, see the slash commands below.
 
 h2. Slash Commands
