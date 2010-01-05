@@ -22,7 +22,7 @@ local L = setmetatable({}, {__index=function(t,i) return i end})
 
 local function Print(...) print("|cFF33FF99"..addonName.."|r:", ...) end
 local function Debug(...) local debugf = tekDebug and tekDebug:GetFrame(addonName); if debugf then debugf:AddMessage(string.join(", ", tostringall(...))) end end
-local function CanSetRaidMarks() return (GetNumPartyMembers() > 0 and IsPartyLeader()) or (GetNumRaidMembers() > 0 and (IsRaidLeader() or IsRaidOfficer())) end
+local function CanSetRaidMarks() return (GetNumPartyMembers() > 0 and GetNumRaidMembers() == 0) or (GetNumRaidMembers() > 0 and (IsRaidLeader() or IsRaidOfficer())) end
 local function GetTipAnchor(frame)
 	local x,y = frame:GetCenter(); if not x or not y then return "TOPLEFT", "BOTTOMLEFT" end
 	local hhalf = (x > UIParent:GetWidth()*2/3) and "RIGHT" or (x < UIParent:GetWidth()/3) and "LEFT" or ""
