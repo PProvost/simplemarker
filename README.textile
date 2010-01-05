@@ -1,6 +1,6 @@
 h2. About SimpleMarker
 
-A simple on-screen set of raid target buttons that only appear when you are allowed to mark (raid leader or assitant or in a 5-man party) and have a target. Easily positioned by dragging where you want it to be.
+A simple on-screen set of raid target buttons that only appear when you are allowed to mark (raid leader/assitant or in a 5-man party) and have a target. Easily positioned by dragging where you want it to be.
 
 When first installed, the frame will be positioned in the center of the screen. To unlock it and move it, see the slash commands below.
 
