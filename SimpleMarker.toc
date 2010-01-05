@@ -4,18 +4,20 @@
 ## Author: Quaiche
 ## Version: @project-version@
 ## SavedVariables: SimpleMarkerDB
+
 ## X-Category: Interface Enhancements
 ## X-License: Apache 2.0
 ## X-Credits: FamFam Silk for the LDB Launcher icon (http://www.famfamfam.com/lab/icons/silk/)
 ## X-Usage: Type /simplemarker and follow the usage instructions
+
 ## LoadManagers: AddonLoader
 ## X-LoadOn-Group: true
 ## X-LoadOn-Slash: /simplemarker
 
-LibStub.lua
-CallbackHandler-1.0.lua
-LibDataBroker-1.1.lua
-tekKonfigAboutPanel.lua
+libs\LibStub.lua
+libs\CallbackHandler-1.0.lua
+libs\LibDataBroker-1.1.lua
+libs\tekKonfigAboutPanel.lua
 
 SimpleMarker.lua
 
