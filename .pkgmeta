@@ -1,6 +1,3 @@
 package-as: SimpleMarker
 
-ignore:
- - Other # ignore the Other folder
-
 license-output: LICENSE.txt
