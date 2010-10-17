@@ -111,10 +111,10 @@ function SimpleMarker:CreateAnchorFrame()
 	frame:Hide()
 
 	frame:RegisterForDrag("LeftButton")
-	frame:SetScript("OnDragStart", function() this:StartMoving() end )
-	frame:SetScript("OnDragStop", function() 
-		this:StopMovingOrSizing() 
-		self:SaveFrameLocation(this)
+	frame:SetScript("OnDragStart", function(self) self:StartMoving() end )
+	frame:SetScript("OnDragStop", function(frame) 
+		frame:StopMovingOrSizing() 
+		self:SaveFrameLocation(frame)
 	end)
 
 	frame.buttons = {}
