@@ -119,11 +119,18 @@ function SimpleMarker:CreateAnchorFrame()
 
 	frame.buttons = {}
 	for i = 0,8 do
-		local button = CreateFrame("Button", nil, frame)
+		local button = CreateFrame("Button", nil, frame, "SecureActionButtonTemplate")
 		button:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -8+(-18*i), -8)
 		button:SetWidth(16)
 		button:SetHeight(16)
 		button:RegisterForClicks("AnyUp")
+
+		--[[ These work for setting the "smoke" icons. You can only do 1-5. 1(blue), 2(green), 3(purple), 4(red), 5(yellow) ]]
+		--[[
+		button:SetAttribute("type1", "macro")
+		button:SetAttribute("macrotext1", "/click CompactRaidFrameManagerDisplayFrameLeaderOptionsRaidWorldMarkerButton\n/click DropDownList1Button1")
+		]]
+
 		button:SetScript("OnClick", function(self) SetRaidTarget("target", i) end)
 		button:SetScript("OnLeave", function(self) GameTooltip:Hide() end)
 		button:SetScript("OnEnter", function(self)
