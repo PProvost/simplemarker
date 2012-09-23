@@ -1,4 +1,4 @@
-## Interface: 40300
+## Interface: 50001
 ## Title: Simple Marker
 ## Notes: A simple raid target marking frame. Put it wherever you want and click to assign marks.
 ## Author: Quaiche
