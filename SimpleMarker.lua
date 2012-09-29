@@ -156,10 +156,12 @@ function SimpleMarker:CreateAnchorFrame()
 end
 
 function SimpleMarker:CheckFrameVisibility()
-	if (not db.isLocked) or (CanSetRaidMarks() and UnitExists("target")) then
-		self.frame:Show()
-	else
-		self.frame:Hide()
+	if self.frame:CanChangeProtectedState() then
+		if (not db.isLocked) or (CanSetRaidMarks() and UnitExists("target")) then
+			self.frame:Show()
+		else
+			self.frame:Hide()
+		end
 	end
 end
 
